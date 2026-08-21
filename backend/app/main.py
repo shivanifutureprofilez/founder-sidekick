@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from dotenv import load_dotenv
 
 from app.database import check_db_connection
+from app.api.chat import router as chat_router
 
 load_dotenv()
 
@@ -10,6 +11,8 @@ app = FastAPI(
     description="Backend API for Founder Sidekick",
     version="0.1.0"
 )
+
+app.include_router(chat_router)
 
 
 @app.get("/")

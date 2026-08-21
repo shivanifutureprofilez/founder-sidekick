@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import List
 from sqlalchemy.orm import Session
 from app.database.models import Message, Conversation
@@ -13,7 +14,12 @@ class MessageService:
         if not conv:
             raise ValueError(f"Conversation '{conversation_id}' does not exist.")
 
-        message = Message(conversation_id=conversation_id, role=role, content=content)
+        message = Message(
+            conversation_id=conversation_id,
+            role=role,
+            content=content,
+            created_at=datetime.now(timezone.utc),
+        )
         db.add(message)
         db.commit()
         db.refresh(message)
@@ -33,8 +39,9 @@ class MessageService:
         recent = (
             db.query(Message)
             .filter(Message.conversation_id == conversation_id)
-            .order_by(Message.created_at.desc(), Message.id.desc())
+            .order_by(Message.created_at.desc())
             .limit(limit)
             .all()
         )
         return list(reversed(recent))
+
