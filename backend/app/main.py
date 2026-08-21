@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
-import os
+
+from app.database import check_db_connection
 
 load_dotenv()
 
@@ -10,10 +11,17 @@ app = FastAPI(
     version="0.1.0"
 )
 
+
 @app.get("/")
 def read_root():
     return {"message": "Founder Sidekick API is running!"}
 
+
 @app.get("/health")
 def health_check():
-    return {"status": "healthy"}
+    db_status = check_db_connection()
+    status_str = "healthy" if db_status.get("connected") else "degraded"
+    return {
+        "status": status_str,
+        "database": db_status
+    }
